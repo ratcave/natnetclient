@@ -1,3 +1,3 @@
 __author__ = 'nickdg'
 
-from optitrack import Optitrack, NatCommSocket, NatDataSocket
+from natnet import NatClient, NatCommSocket, NatDataSocket

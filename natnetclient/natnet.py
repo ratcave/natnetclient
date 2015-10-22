@@ -170,7 +170,7 @@ class NatDataSocket(NatSocket):
         return NatPacket(self._sock.recv(self.max_packet_size))
 
 
-class Optitrack(object):
+class NatClient(object):
 
     def __init__(self, client_ip=CLIENT_ADDRESS, data_port=PORT_DATA, comm_port=PORT_COMMAND, read_rate=400):
         """
