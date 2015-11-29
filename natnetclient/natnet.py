@@ -260,7 +260,7 @@ class NatClient(object):
 
         warnings.warn("WARNING: Changing the Take File Name often results in Motive Crashing and Faulting...\n...best to not "
                           "use this functionality for current_time.  Trying anyway...")
-        self.comm_sock.send(2, "SetRecordTakeName," + file_name)
+        self.comm_sock.send(2, "SetRecordTakeName," + str(file_name))
 
     def start_recording(self, n_attempts=3):
         """
