@@ -526,18 +526,20 @@ class NatClient(object):
         self.is_recording = bool(end_params & 0x01)  # Motive is Recording
         self.tracked_models_changed = bool( end_params & 0x02)
 
-    def wait_for_recording_start(self):
+    def wait_for_recording_start(self, debug_mode=False):
         """Halts script until recording begins."""
-        print("Waiting for recording to begin...")
-        while not self.is_recording:
-            self.get_data()
-        print("...Recording started.")
+        if not debug_mode:
+            print("Waiting for recording to begin...")
+            while not self.is_recording:
+                self.get_data()
+            print("...Recording started.")
 
-    def wait_for_recording_stop(self):
+    def wait_for_recording_stop(self, debug_mode=False):
         """Halts script until recording ends."""
-        print("Waiting for recording to end...")
-        while self.is_recording:
-            self.get_data()
-        print("...Recording stopped.")
+        if not debug_mode:
+            print("Waiting for recording to end...")
+            while self.is_recording:
+                self.get_data()
+            print("...Recording stopped.")
 
 
