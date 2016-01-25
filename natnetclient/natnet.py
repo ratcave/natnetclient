@@ -422,6 +422,7 @@ class NatClient(object):
         # Unidentified Markers
         self.unidentified_markers = []
         nOtherMarkers = unpack('i', data.read(4))[0]
+
         for el in range(nOtherMarkers):  # nOtherMarkers
             x, y, z = unpack('3f', data.read(12))
             self.unidentified_markers.append(Marker(position=(x, y, z)))  # (x, y, z)
@@ -506,6 +507,19 @@ class NatClient(object):
                     self.labeled_markers[marker_id].occluded = bool(params & 0x01)  # marker occluded this frame
                     self.labeled_markers[marker_id].pc_solved = bool(params & 0x02)  # Position provided by point cloud solve (directly measured)
                     self.labeled_markers[marker_id].model_solved = bool(params & 0x04)  # Position provided by model solve (indirectly filled in)
+
+        # For NatNet 2.9, Force Plate Data is supplied.
+        if (major == 2 and minor >= 9):
+            force_plate_n = unpack('i', data.read(4))[0]
+            if force_plate_n:
+                raise NotImplementedError("Force Plates not yet supported.")
+            for force_plate in range(force_plate_n):
+                force_plate_id = unpack('i', data.read(4))[0]
+                for force_plate_channel in range(unpack('i', data.read(4))[0]):
+                    for frame in unpack('i', data.read(4))[0]:
+                        frame_val = unpack('f', data.read(4))[0]
+
+
 
         # Final Frame Info
         self.latency = unpack('f', data.read(4))[0]  # TODO: Find out how Optitrack latency is calculated. Somehow related to self.timestamp.
