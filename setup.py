@@ -14,4 +14,5 @@ setup(name='NatNetClient',
             "Operating System :: OS Independent",
             "License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)",
             ],
+      test_suite='tests',
       )
