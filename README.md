@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/neuroneuro15/natnetclient.svg?branch=master)](https://travis-ci.org/neuroneuro15/natnetclient)
 
+![Window Build Status](https://ci.appveyor.com/api/projects/status/github/neuroneuro15/natnetclient?svg=True)
+
 [![Coverage Status](https://coveralls.io/repos/github/neuroneuro15/natnetclient/badge.svg?branch=master)](https://coveralls.io/github/neuroneuro15/natnetclient?branch=master)
 
 # natnetclient
