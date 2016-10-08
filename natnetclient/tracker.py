@@ -1,7 +1,6 @@
 __author__ = 'nickdg'
 
 import math
-import pdb
 from collections import namedtuple
 
 Position = namedtuple("Position", "x y z")
