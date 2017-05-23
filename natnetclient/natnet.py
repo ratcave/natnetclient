@@ -66,7 +66,7 @@ class NatSocket(object):
         self.client_ip = client_ip
         self.port = port
         # self.port = socket.htons(uPort)  # Not sure why this is necessary.
-        assert isinstance(max_packet_size/4, int), "max_packet_size must be divisible by 4"
+        assert max_packet_size % 4 == 0, "max_packet_size must be divisible by 4"
         self.max_packet_size = max_packet_size
 
 class NatCommSocket(NatSocket):
