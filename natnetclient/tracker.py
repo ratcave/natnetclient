@@ -6,6 +6,18 @@ from collections import namedtuple
 
 Position = namedtuple("Position", "x y z")
 RotationEuler = namedtuple("RotationEuler", "x y z")
+RotationQuaternion = namedtuple("RotationQuaternion", "x y z w")
+
+
+def quaternion_to_euler(qx, qy, qz, qw):
+    """Convert quaternion (qx, qy, qz, qw) angle to euclidean (x, y, z) angles, in degrees.
+    Equation from http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/"""
+
+    heading = math.atan2(2*qy*qw-2*qx*qz , 1 - 2*qy**2 - 2*qz**2)
+    attitude = math.asin(2*qx*qy + 2*qz*qw)
+    bank = math.atan2(2*qx*qw-2*qy*qz , 1 - 2*qx**2 - 2*qz**2)
+
+    return [math.degrees(angle) for angle in [attitude, heading, bank]]  # TODO: May need to change some things to negative to deal with left-handed coordinate system.
 
 
 class MarkerSet(object):
@@ -50,6 +62,7 @@ class RigidBody(object):
         self.__position, self.__rotation = None, None
         self.__rotation_to_var = None
 
+
     @property
     def position(self):
         return self.__position
@@ -60,20 +73,17 @@ class RigidBody(object):
 
     @property
     def rotation(self):
-        return self.__rotation
+        return RotationEuler(*quaternion_to_euler(*self.__quaternion))
 
-    @rotation.setter
-    def rotation(self, value):
-        coords = value if len(value)==3 else self.__quaternion_to_euler(*value)
-        self.__rotation = RotationEuler(*coords)
+    # @rotation.setter
+    # def rotation(self, value):
+    #     coords = value if len(value)==3 else quaternion_to_euler(*value)
+    #     self.__rotation = RotationEuler(*coords)
 
-    def __quaternion_to_euler(self, qx, qy, qz, qw):
-        """Convert quaternion (qx, qy, qz, qw) angle to euclidean (x, y, z) angles, in degrees.
-        Equation from http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/"""
+    @property
+    def quaternion(self):
+        return self.__quaternion
 
-        heading = math.atan2(2*qy*qw-2*qx*qz , 1 - 2*qy**2 - 2*qz**2)
-        attitude = math.asin(2*qx*qy + 2*qz*qw)
-        bank = math.atan2(2*qx*qw-2*qy*qz , 1 - 2*qx**2 - 2*qz**2)
-
-        return [math.degrees(angle) for angle in [attitude, heading, bank]]  # TODO: May need to change some things to negative to deal with left-handed coordinate system.
-
+    @quaternion.setter
+    def quaternion(self, coords):
+        self.__quaternion = RotationQuaternion(*coords)

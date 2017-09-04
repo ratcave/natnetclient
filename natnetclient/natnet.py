@@ -93,8 +93,6 @@ class NatCommSocket(NatSocket):
         """Receives packet from NatNet Server and returns as NatPacket instance."""
         packet = self._sock.recv(self.max_packet_size + 4)
         packet = NatPacket(packet)
-        print( "[Client] Received command from {0}: Command={1}, nDataBytes={2}".format(
-                self.client_ip, packet.iMessage, packet.nDataBytes))
         return packet
 
     def send(self, nat_value, message='', sleep_time=.02):
@@ -121,7 +119,6 @@ class NatCommSocket(NatSocket):
             self._sock.sendto(pack("HH", nat_value, 4), (self.server_ip, self.port))  # send both nat_value and packet size
 
         time.sleep(sleep_time)
-        print("Message sent.")
 
     def get_data(self, nat_value, message='', num_attempts=3):
         """Combines the send() and recv() functions into a single convenience function for requesting data.
@@ -135,7 +132,6 @@ class NatCommSocket(NatSocket):
                 time.sleep(.008)
                 packet = self.recv()
                 if packet.iMessage == nat_value + 1:
-                    print("Correct packet received on attempt {0}.".format(receive_attempt))
                     # if packet.iMessage == NAT_RESPONSE:  # Should always get a reply, but seems a bit unreliable.
                     #    print("Message: {0}".format(packet._packet[4:]))
                     return packet
@@ -163,7 +159,7 @@ class NatDataSocket(NatSocket):
         self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, OPT_VAL)
         self._sock.bind((client_ip, port))
         # self.bind((Optitrack.CLIENT_ADDRESS, socket.htons(Optitrack.PORT_DATA)))  # If the above line doesn't work.
-        self._sock.settimeout(4.0)
+        self._sock.settimeout(60.0)
 
     def recv(self):
         """Receives packet from NatNet Server and returns as NatPacket instance."""
@@ -250,7 +246,6 @@ class NatClient(object):
         NatNetVersion = unpacked[5:9]
 
         assert NatNetVersion[0] >= 2, "NatNetVersion not compatible with parser (Requires 2.0.0.0 or up)"
-        print('Ping Response Received from compatible server.')
 
         return (server_name, Version, NatNetVersion)
 
@@ -311,10 +306,7 @@ class NatClient(object):
             # Check if successful, by getting new data packet.
             self.get_data()
             if self.is_recording == False:
-                print("Recording Started Successfully")
                 return
-            else:
-                print("Recording failed on attempt number {0}.  Trying again...".format(attempt))
 
         warnings.warn("Motive isn't currently responding to the 'StopRecording' command.  This seems to be a Motive bug, but cause is unknown.\n"
                       "For the time being, manual stopping is suggested.")
@@ -434,7 +426,7 @@ class NatClient(object):
             body_id, x, y, z, qx, qy, qz, qw = unpack('i7f',data.read(32))
             body = self.rigid_bodies_by_id[body_id] #self.rigid_bodies[id]
             body.position = x, y, z
-            body.rotation = qx, qy, qz, qw
+            body.quaternion = qx, qy, qz, qw
 
             # Get body's markers' information
             body.markers = []  # That's right.  Reset the whole damn marker list.
@@ -543,17 +535,13 @@ class NatClient(object):
     def wait_for_recording_start(self, debug_mode=False):
         """Halts script until recording begins."""
         if not debug_mode:
-            print("Waiting for recording to begin...")
             while not self.is_recording:
                 self.get_data()
-            print("...Recording started.")
 
     def wait_for_recording_stop(self, debug_mode=False):
         """Halts script until recording ends."""
         if not debug_mode:
-            print("Waiting for recording to end...")
             while self.is_recording:
                 self.get_data()
-            print("...Recording stopped.")
 
 
