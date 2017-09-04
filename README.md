@@ -1,19 +1,20 @@
+[![Build Status](https://travis-ci.org/neuroneuro15/natnetclient.svg?branch=master)](https://travis-ci.org/neuroneuro15/natnetclient)
+
+![Window Build Status](https://ci.appveyor.com/api/projects/status/github/neuroneuro15/natnetclient?svg=True)
+
+[![Coverage Status](https://coveralls.io/repos/github/neuroneuro15/natnetclient/badge.svg?branch=master)](https://coveralls.io/github/neuroneuro15/natnetclient?branch=master)
+
 # natnetclient
-Python NatNet Client for retrieving NaturalPoint's Optitrack data from their Motive software using depacketization.
+Python NatNet Client for retrieving NaturalPoint's Optitrack data from their Motive software using socket depacketization. This project cross-platform and compatible with both Python 2 and Python 3.
+
 
 ##Installation
-To install, simply download the repository, navigate to its directory, and use the 'python setup.py install' command.  
-For example:
 
 ```
-cd Downloads/natnetclient
-python setup.py install
+pip install natnetclient
 ```
 
 ## Quick Guide
-
-While I plan to add some documentation in the future, it might be a while,
-(please message me if you'd like it, and I'll get right on it!), so here is a quick summary of how to get started:
 
 ### Connecting to Motive
 
@@ -25,23 +26,29 @@ import natnetclient as natnet
 client = natnet.NatClient(client_ip='127.0.0.1', data_port=1511, comm_port=1510)
 ```
 
-The NatClient contains a NatCommSocket and a NatDataSocket, and when connected, automatically starts a Threading thread that continually
-retrieves data.  In addition, it performs depacketization and stores the data.
+### Get Rigid Bodies
 
-### Miscellaneous Commands
+Once the NatClient is connected, it will automatically and continuously get the latest information on its own thread.
 
-Try the following to get started.  You'll find a lot of useful functions and properties in the NatClient, RigidBody, and Marker classes.
+Rigid bodies are stored in a dictionary, and classes exist for Rigid Bodies and Markers, each with their own properties, supplied by Motive:
 
 ```python
-rigid_body_dict = client.rigid_bodies
-body = rigid_body_dict['NameOfBody']
-xyz = body.position
-xyz_rot = body.rotation
-body_markers = body.markers
-body_marker_position = body_markers[0].position
+hand = client.rigid_bodies['Hand'] # Assuming a Motive Rigid Body is available that you named "Hand"
+print(hand.position)
+print(hand.rotation)
+
+hand_markers = hand.markers  # returns a list of markers, each with their own properties
+print(hand_markers[0].position)
 ```
 
-## Retriving 
+## Troubleshooting
 
+### NatClient is timing out and not connecting.
 
+  - Make sure that Motive is streaming--for some reason, recent versions of Motive have this off by default.
+  - Make sure the IP and ports in NatClient match Motive's settings, so they can talk to each other.
+
+### NatClient's Rigidbody dictionary is Empty
+
+  - Make sure Motive's "Stream Rigid Bodies" option is turned on.  Recently, Motive's default is to not stream that info.
 

@@ -1,7 +1,7 @@
 import socket
 from struct import pack, unpack
 from .tracker import Marker, MarkerSet, RigidBody
-from cStringIO import StringIO
+from io import BytesIO
 import time
 import threading
 import warnings
@@ -322,7 +322,7 @@ class NatClient(object):
             return None
 
         # Parse the Packet
-        data = StringIO(packet._packet[4:]) # Skip Message ID, nBytes data
+        data = BytesIO(packet._packet[4:]) # Skip Message ID, nBytes data
 
         d_name_list = []
         for el in range(unpack('i', data.read(4))[0]):  # nDatasets
@@ -396,8 +396,8 @@ class NatClient(object):
 
         packet = self.data_sock.recv()
 
-        # Get Data and Convert to StringIO type for easier and quicker reading.
-        data = StringIO(packet._packet[4:])
+        # Get Data and Convert to BytesIO type for easier and quicker reading.
+        data = BytesIO(packet._packet[4:])
 
         # Frame Number
         self.iFrame = unpack("i", data.read(4))[0]  # Frame number
