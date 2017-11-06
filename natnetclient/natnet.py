@@ -6,14 +6,19 @@ import time
 import threading
 import warnings
 import datetime
+import sys
+
+PYTHON_VERSION = sys.version_info[0]
 
 def strcpy(stream):
     """Reads a IOStream one step at a time, returning the previous string before it reached a null character."""
-    eof, szName, idx = '', [], 0
-    while idx <= 200 and eof != '\x00':  # Read until null terminator or after 200 characters.
-        szName.append(eof)
-        eof = stream.read(1)
-    return ''.join(szName).replace(' ', '_')  # Convert to string without spaces.
+    msg, szName, idx = 'default', [], 0
+    while idx <= 200 and msg != b'\x00':  # Read until null terminator or after 200 characters.
+        msg = stream.read(1)
+        szName.append(msg)
+        idx += 1
+
+    return b''.join(szName[:-1]).replace(b' ', b'_').decode()  # Convert to string without spaces.
 
 NAT_PING  					= 0
 NAT_PINGRESPONSE			= 1
@@ -62,12 +67,17 @@ class NatSocket(object):
 
     def __init__(self, client_ip, port, max_packet_size=MAX_PACKETSIZE):
 
+        if max_packet_size % 4 == 0:
+            self.max_packet_size = max_packet_size
+        else:
+            raise ValueError("max_packet_size must be divisible by 4.")
+
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
         self.client_ip = client_ip
         self.port = port
         # self.port = socket.htons(uPort)  # Not sure why this is necessary.
-        assert isinstance(max_packet_size/4, int), "max_packet_size must be divisible by 4"
-        self.max_packet_size = max_packet_size
+
+
 
 class NatCommSocket(NatSocket):
 
@@ -114,7 +124,7 @@ class NatCommSocket(NatSocket):
         message_len = len(message)
 
         if message_len > 0:
-            self._sock.sendto(pack("HH"+str(message_len)+"s", nat_value, 4+message_len, message), (self.server_ip, self.port))  # send both nat_value and packet size
+            self._sock.sendto(pack("HH"+bytes(message_len)+"s", nat_value, 4+message_len, message), (self.server_ip, self.port))  # send both nat_value and packet size
         else:
             self._sock.sendto(pack("HH", nat_value, 4), (self.server_ip, self.port))  # send both nat_value and packet size
 
@@ -153,7 +163,8 @@ class NatDataSocket(NatSocket):
         super(NatDataSocket, self).__init__(client_ip, port, max_packet_size)
 
         # Configure and Connect socket
-        self._sock._sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+        self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         mreq = socket.inet_aton(MULTICAST_ADDRESS) + socket.inet_aton(client_ip)
         self._sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
         self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, OPT_VAL)
@@ -241,7 +252,7 @@ class NatClient(object):
         packet = self.comm_sock.get_data(NAT_PING)
 
         unpacked = unpack(str(MAX_NAMELENGTH) + "s4B4B", packet._packet[4:])
-        server_name = unpacked[0].split('\x00')[0]  # Rest of name string is junk.
+        server_name = str(unpacked[0].split(b'\x00')[0])  # Rest of name string is junk.
         Version = unpacked[1:5]
         NatNetVersion = unpacked[5:9]
 
@@ -255,7 +266,7 @@ class NatClient(object):
 
         warnings.warn("WARNING: Changing the Take File Name often results in Motive Crashing and Faulting...\n...best to not "
                           "use this functionality for current_time.  Trying anyway...")
-        self.comm_sock.send(2, "SetRecordTakeName," + str(file_name))
+        self.comm_sock.send(2, "SetRecordTakeName," + bytes(file_name))
 
     def start_recording(self, n_attempts=3):
         """
