@@ -1,0 +1,11 @@
+README.md
+setup.py
+NatNetClient.egg-info/PKG-INFO
+NatNetClient.egg-info/SOURCES.txt
+NatNetClient.egg-info/dependency_links.txt
+NatNetClient.egg-info/top_level.txt
+natnetclient/__init__.py
+natnetclient/natnet.py
+natnetclient/tracker.py
+tests/__init__.py
+tests/test_imports.py

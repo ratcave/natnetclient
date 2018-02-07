@@ -1,0 +1,15 @@
+Metadata-Version: 1.1
+Name: NatNetClient
+Version: 0.8
+Summary: Client for getting Optitrack data from Motive through the NatNet Stream.
+Home-page: https://www.github.com/neuroneuro15/natnetclient
+Author: Nicholas A. Del Grosso
+Author-email: delgrosso@bio.lmu.de
+License: UNKNOWN
+Description-Content-Type: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python
+Classifier: Development Status :: 4 - Beta
+Classifier: Operating System :: OS Independent
+Classifier: License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)
