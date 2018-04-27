@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='NatNetClient',
-      version='0.8',
+      version='0.8.2',
       description='Client for getting Optitrack data from Motive through the NatNet Stream.',
       author='Nicholas A. Del Grosso',
       author_email='delgrosso@bio.lmu.de',
