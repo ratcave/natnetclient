@@ -7,6 +7,7 @@
 # natnetclient
 Python NatNet Client for retrieving NaturalPoint's Optitrack data from their Motive software using socket depacketization. This project cross-platform and compatible with both Python 2 and Python 3.
 
+**NOTE** This proejct only works for quite old Motive/NatNet setups; I recommend https://github.com/mje-nz/python_natnet; it works great!
 
 ##Installation
 
