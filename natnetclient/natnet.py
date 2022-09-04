@@ -100,7 +100,7 @@ class NatCommSocket(NatSocket):
         self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, OPT_VAL)  # Not originally in this function. Check why.
 
     def recv(self):
-        """Receives packet from NatNet Server and returns as NatPacket instance."""
+        """Receives packet from NatNet Server and returns as NatPacket instance."""        
         packet = self._sock.recv(self.max_packet_size + 4)
         packet = NatPacket(packet)
         return packet
@@ -170,11 +170,19 @@ class NatDataSocket(NatSocket):
         self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, OPT_VAL)
         self._sock.bind((client_ip, port))
         # self.bind((Optitrack.CLIENT_ADDRESS, socket.htons(Optitrack.PORT_DATA)))  # If the above line doesn't work.
-        self._sock.settimeout(60.0)
+        self._sock.settimeout(60)
 
     def recv(self):
         """Receives packet from NatNet Server and returns as NatPacket instance."""
-        return NatPacket(self._sock.recv(self.max_packet_size))
+        packet = b''
+        while True:
+            try:
+                packet = self._sock.recv(self.max_packet_size)
+                self._sock.settimeout(0)
+            except socket.error as e:
+                break
+        self._sock.settimeout(60)
+        return NatPacket(packet)
 
 
 class NatClient(object):
